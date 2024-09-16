@@ -12,7 +12,9 @@
     </div>
     <div>
         {#each [...data.favorites] as [key, value]}
-            <Anime title={value.title} mal_id={key} image={value.image} />
+            <div class="my-2">
+                <Anime title={value.title} mal_id={key} image={value.image} />
+            </div>
         {/each}
     </div>
 </div>
