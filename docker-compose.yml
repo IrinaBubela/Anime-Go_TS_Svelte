@@ -26,4 +26,6 @@ services:
     environment:
       - LOG_LEVEL=debug
       - HTTP_PORT=3001
+    ports:
+      - 3001:3001
     command: go run main.go

@@ -19,7 +19,7 @@ export default async function api<T, D = T>(
 
         // check if invalid response
         if (!res.ok) {
-            return { success: false, error: res.statusText };
+            return { success: false, error: await res.text() };
         }
         // check if empty response
         if (res.status === 204) {

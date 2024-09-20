@@ -27,7 +27,7 @@
 
 {#if loading}
     <div
-        class="absolute left-0 top-0 flex h-full w-full items-center justify-center bg-gray-900"
+        class="spinner absolute left-0 top-0 flex h-full w-full items-center justify-center bg-gray-900"
     >
         <svg
             class="mr-3 h-10 w-10 animate-spin text-white"
@@ -65,3 +65,9 @@
         {/each}
     </div>
 {/each}
+
+<style>
+    .spinner {
+        z-index: 999;
+    }
+</style>
