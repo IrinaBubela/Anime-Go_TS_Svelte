@@ -2,7 +2,6 @@ import api from "$lib/server/api";
 import { error } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 import { SERVER_URL } from "$env/static/private";
-import { toast } from 'svelte-sonner';
 
 export type Anime = {
     data: {
@@ -44,6 +43,8 @@ export const actions = {
         const title = form.get("title") as unknown as string;
         const image = form.get("image") as unknown as string;
 
+        const responseMessage: { error: string, success: string } = { error: '', success: '' };
+
         try {
             const response = await api(`${SERVER_URL}/favorites`,
                 {
@@ -60,21 +61,24 @@ export const actions = {
             );
 
             if (response.success) {
-                toast('Favorite added successfully!');
+                responseMessage.success = 'Favorite added successfully!';
             } else {
                 if (response.error === 'Maximum limit of 5 favorites reached') {
-                    toast('You have reached the limit of 5 favorites.');
+                    responseMessage.error = 'You have reached the limit of 5 favorites.!';
                 } else {
-                    toast('An error occurred while adding the favorite.');
+                    responseMessage.error = 'An error occurred while adding the favorite.';
                 }
             }
         } catch (error) {
-            toast('An unexpected error occurred.');
+            responseMessage.error = `An unexpected error occurred while deleting the favorite: ${error}`;
         }
+        return responseMessage;
     },
     deleteFavorite: async ({ request }) => {
         const form = await request.formData();
         const id = form.get("mal_id") as unknown as string;
+
+        const responseMessage: { error: string, success: string } = { error: '', success: '' };
 
         try {
             const response = await api(`${SERVER_URL}/favorites/${id}`, {
@@ -82,12 +86,13 @@ export const actions = {
             });
 
             if (response.success) {
-                toast('Favorite deleted successfully!');
+                responseMessage.success = 'Favorite deleted successfully!';
             } else {
-                toast('An error occurred while deleting the favorite.');
+                responseMessage.error = 'An error occurred while deleting the favorite.';
             }
         } catch (error) {
-            toast('An unexpected error occurred while deleting the favorite:', error);
+            responseMessage.error = `An unexpected error occurred while deleting the favorite: ${error}`;
         }
+        return responseMessage;
     }
 } satisfies Actions;

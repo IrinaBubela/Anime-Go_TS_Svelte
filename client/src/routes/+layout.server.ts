@@ -2,9 +2,10 @@ import { SERVER_URL } from "$env/static/private";
 import api from "$lib/server/api";
 import { z } from "zod";
 import type { LayoutServerLoad } from "./$types";
+import { error } from '@sveltejs/kit';
 
 export type Favorite = {
-    id: string; 
+    id: string;
     anime_id: string;
     anime_title: string;
     anime_image_url: string;
@@ -27,26 +28,21 @@ const favoriteSchema = z.object({
 
 
 export const load: LayoutServerLoad = (async () => {
+
     try {
-        const response = await api(`${SERVER_URL}/favorites`);
 
+        const response = await api<Favorite[]>(`${SERVER_URL}/favorites`);
         if (!response.success) {
-            console.error(
-                "Failed to load favorites from server",
-                response.error
-            );
-            return {
-                favorites: new Map() 
-            };
+            throw error(500, response.error);
         }
+        const favoritesData: Favorite[] = response.data;
 
-        const favoritesData: Favorite[] = response.data as Favorite[];
-        
         favoritesData.forEach(fav => {
             try {
                 favoriteSchema.parse(fav);
             } catch (e) {
                 console.error("Favorite validation error:", e);
+                throw error(500, "Favorite validation failed.");
             }
         });
 
@@ -57,6 +53,7 @@ export const load: LayoutServerLoad = (async () => {
                 image: fav.anime_image_url
             }])
         );
+
         return {
             favorites: favorites
         };
